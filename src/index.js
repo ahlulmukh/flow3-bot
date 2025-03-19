@@ -20,6 +20,7 @@ async function main() {
     const accounts = fs
       .readFileSync("accounts.txt", "utf8")
       .split("\n")
+      .map((account) => account.trim())
       .filter(Boolean);
     const count = accounts.length;
     const proxiesLoaded = loadProxies();
