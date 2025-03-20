@@ -36,6 +36,22 @@ module.exports = class flow3Bot {
 
         return response;
       } catch (error) {
+        if (error.response && error.response.status === 401) {
+          logMessage(
+            this.currentNum,
+            this.total,
+            "Unauthorized (401), trying to re-login...",
+            "warning"
+          );
+          this.token = await this.loginUser();
+          logMessage(
+            this.currentNum,
+            this.total,
+            "Re-login successful, retrying request...",
+            "process"
+          );
+          continue;
+        }
         logMessage(
           this.currentNum,
           this.total,
