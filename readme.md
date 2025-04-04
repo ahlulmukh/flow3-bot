@@ -36,14 +36,12 @@ for sharing bandwith to earning flow3
    http://user:pass@host:port
    ```
 
-4. Create account file, `nano accounts.txt`, and put your privatekey one per line
+4. Create account file, `nano accounts.txt`, and put your refreshToken one per line
 
    ```
-   3sot7kKZit1fVp4hrByXqUzN3EJjXf
-   3sot7kKZit1fVp4hrByXqUzN3EJjXf
-   3sot7kKZit1fVp4hrByXqUzN3EJjXf
-   3sot7kKZit1fVp4hrByXqUzN3EJjXf
-   3sot7kKZit1fVp4hrByXqUzN3EJjXf
+   eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+   eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+   eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
    ```
 
 ## Usage
