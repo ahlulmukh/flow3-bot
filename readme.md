@@ -44,6 +44,12 @@ for sharing bandwith to earning flow3
    eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
    ```
 
+## How To Get Refresh Token??
+
+Go to extension and inspect or open developer console, you reload with ctrl + r in extension, and you will find refreshToken like this picture
+
+![RefreshToken](https://imgur.com/NMxFU2I)
+
 ## Usage
 
 1. Run the bot:
