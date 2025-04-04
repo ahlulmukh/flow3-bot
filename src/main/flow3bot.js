@@ -1,40 +1,28 @@
 const { getProxyAgent } = require("./proxy");
 const UserAgent = require("user-agents");
 const axios = require("axios");
-const bs58 = require("bs58");
-const nacl = require("tweetnacl");
-const { Keypair } = require("@solana/web3.js");
 const { logMessage } = require("../utils/logger");
-const userAgent = new UserAgent().toString();
-
 module.exports = class flow3Bot {
   constructor(account, proxy = null, currentNum, total) {
     this.currentNum = currentNum;
     this.total = total;
     this.token = null;
     this.proxy = proxy;
-    this.wallet = this.getWalletFromPrivateKey(account);
-    this.axiosConfig = {
-      ...(this.proxy && { httpsAgent: getProxyAgent(this.proxy) }),
+    this.refreshToken = account;
+    this.axios = axios.create({
+      httpsAgent: proxy ? getProxyAgent(proxy) : undefined,
       timeout: 120000,
       headers: {
-        "User-Agent": userAgent,
+        "User-Agent": new UserAgent().toString(),
         Origin: "chrome-extension://lhmminnoafalclkgcbokfcngkocoffcp",
       },
-    };
+    });
   }
 
   async makeRequest(method, url, config = {}, retries = 3) {
     for (let i = 0; i < retries; i++) {
       try {
-        const response = await axios({
-          method,
-          url,
-          ...this.axiosConfig,
-          ...config,
-        });
-
-        return response;
+        return await this.axios({ method, url, ...config });
       } catch (error) {
         if (error.response && error.response.status === 401) {
           logMessage(
@@ -52,10 +40,17 @@ module.exports = class flow3Bot {
           );
           continue;
         }
+        const errorData = error.response ? error.response.data : error.message;
         logMessage(
           this.currentNum,
           this.total,
-          `Request Failed ${error.message}`,
+          `Request failed: ${error.message}`,
+          "error"
+        );
+        logMessage(
+          this.currentNum,
+          this.total,
+          `Error response data: ${JSON.stringify(errorData, null, 2)}`,
           "error"
         );
 
@@ -71,20 +66,6 @@ module.exports = class flow3Bot {
     return null;
   }
 
-  getWalletFromPrivateKey(privateKeyBase58) {
-    const secretKey = bs58.decode(privateKeyBase58);
-    const keypair = Keypair.fromSecretKey(secretKey);
-    return keypair;
-  }
-
-  async generateSignature(message) {
-    const messageBuffer = Buffer.from(message);
-    const secretKey = new Uint8Array(this.wallet.secretKey);
-    const signature = nacl.sign.detached(messageBuffer, secretKey);
-    const encode = bs58.encode(signature);
-    return encode;
-  }
-
   async loginUser() {
     logMessage(
       this.currentNum,
@@ -92,20 +73,21 @@ module.exports = class flow3Bot {
       `Trying Login Account...`,
       "process"
     );
-    const message = `Please sign this message to connect your wallet to Flow 3 and verifying your ownership only.`;
-    const signature = await this.generateSignature(message);
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${this.refreshToken}`,
+    };
     const payload = {
-      message: message,
-      walletAddress: this.wallet.publicKey.toBase58(),
-      signature: signature,
+      refreshToken: this.refreshToken,
     };
 
     try {
       const response = await this.makeRequest(
         "POST",
-        "https://api.flow3.tech/api/v1/user/login",
+        "https://api.flow3.tech/api/v1/user/refresh",
         {
           data: payload,
+          headers: headers,
         }
       );
       if (response?.data.statusCode === 200) {
@@ -139,7 +121,7 @@ module.exports = class flow3Bot {
     try {
       const response = await this.makeRequest(
         "POST",
-        "https://api.mtcadmin.click/api/v1/bandwidth",
+        "https://api.flow3.tech/api/v1/bandwidth",
         { headers: headers }
       );
       if (response.data.statusCode === 200) {
@@ -177,7 +159,7 @@ module.exports = class flow3Bot {
     try {
       const response = await this.makeRequest(
         "GET",
-        `https://api.mtcadmin.click/api/v1/point/info`,
+        `https://api.flow3.tech/api/v1/point/info`,
         {
           headers: headers,
         }

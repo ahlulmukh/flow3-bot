@@ -11,13 +11,10 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@solana/web3.js": "^1.98.0",
     "axios": "^1.7.9",
-    "bs58": "^5.0.0",
     "chalk": "^4.1.2",
     "https-proxy-agent": "^7.0.6",
     "socks-proxy-agent": "^8.0.5",
-    "tweetnacl": "^1.0.3",
     "user-agents": "^1.1.435"
   }
 }
