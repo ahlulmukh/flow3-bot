@@ -48,7 +48,7 @@ for sharing bandwith to earning flow3
 
 Go to extension and inspect or open developer console, you reload with ctrl + r in extension, and you will find refreshToken like this picture
 
-![RefreshToken](https://imgur.com/NMxFU2I)
+![RefreshToken](https://i.imgur.com/NMxFU2I.png)
 
 ## Usage
 
